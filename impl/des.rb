@@ -1,38 +1,49 @@
+class DES
 
-def encrypt
+  attr_accessor :key, :tmp_subkey
 
-end
+  def encrypt block
+    block = initial_permutation block
+    16.times do
+      left = block[0..7]
+      right = block[8..15]
+      block = append(right, xor(left, feistel(right)))
+    end
+    return final_permutation block
+  end
 
-def initial_permutation
+  def initial_permutation
 
-end
+  end
 
-def final_permutation
+  def final_permutation
 
-end
+  end
 
-def feistel
+  def feistel half-block
+    expanded_block = expand half-block
+    return bit_shuffle(s_box(xor(expanded_block, get_subkey)))
+  end
 
-end
+  # Aids diffusion of key material
+  def expand
 
-# Aids diffusion of key material
-def expand
+  end
 
-end
+  # Ensures non-linearity from plaintext to ciphertext
+  # Each bit of ciphertext should depend on many bits of input
+  def s_box
 
-# Obscures plaintext by adding in random key material
-def key_mix
+  end
 
-end
+  # Diffusion of key material and s-box changes
+  # Each bit of input should change many bits of output
+  def bit_shuffle
 
-# Ensures non-linearity from plaintext to ciphertext
-# Each bit of ciphertext should depend on many bits of input
-def s_box
+  end
 
-end
+  def get_subkey
 
-# Diffusion of key material and s-box changes
-# Each bit of input should change many bits of output
-def bit_shuffle
-
+  end
+  
 end
