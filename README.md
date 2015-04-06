@@ -4,14 +4,13 @@ The purpose of this project is to demonstrate the necessity of each step in a Fe
 
 ### Any implementations of cryptographic software in this repository are **NOT SAFE FOR GENERAL USE**.
 
-In a cipher based on a [Feistel network](https://en.wikipedia.org/wiki/Feistel_cipher), there are three stages that each defeat particular classes of attacks:
+In a cipher based on a [Feistel network](https://en.wikipedia.org/wiki/Feistel_cipher), there are two stages that each defeat particular classes of attacks:
 
-* **Key mixing** provides _entropy_ by obscuring the plaintext with key material. Without a key, any adversary with knowledge of the protocol can decrypt the message; an even weaker adversary can still likely perform a [ciphertext-only attack](https://en.wikipedia.org/wiki/Ciphertext-only_attack).
 * The **S-boxes** provide _non-linearity_ in the ciphertext with respect to the plaintext and key, ensuring that linear relationships do not exist between the ciphertext and the inputs. A cipher without non-linearity is vulnerable to [linear cryptanalytic attacks](https://en.wikipedia.org/wiki/Linear_cryptanalysis).
 * The **bit shuffle** and **plaintext expansion** functions provide _diffusion_, ensuring that small changes in input lead to unpredictable changes in output. A cipher without diffusion is vulnerable to [differential cryptanalytic attacks](https://en.wikipedia.org/wiki/Differential_cryptanalysis).
 
 We will use [DES](https://en.wikipedia.org/wiki/Data_Encryption_Standard) as our cipher, since it is well-known, well-studied, and easy to implement.
-We will perform a practical attack, resulting in either key or plaintext retrieval, on three modified versions of DES; each version will have one of the three above steps omitted to demonstrate the kind of attacks each property protects against.
+We will perform a practical attack, resulting in either key or plaintext retrieval, on two modified versions of DES; each version will have one of the above steps omitted to demonstrate the kind of attacks each property protects against.
 
 
 #####Copyright (C) 2015  Zachary Price
