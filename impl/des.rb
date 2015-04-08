@@ -30,7 +30,7 @@ class DES
 
   # Aids diffusion of key material
   def expand  half_block
-
+    permute half_block, read_perm "../config/expansion.txt"
   end
 
   # Ensures non-linearity from plaintext to ciphertext
@@ -42,7 +42,7 @@ class DES
   # Diffusion of key material and s-box changes
   # Each bit of input should change many bits of output
   def bit_shuffle  half_block
-
+    permute half_block, read_perm "../config/bit_shuffle.txt"
   end
 
   # Returns round keys for each Feistel node
@@ -61,13 +61,11 @@ class DES
   end
 
   def permuted_choice_1 key
-    permutation = File.read("../config/permuted_choice_1.txt").strip.split " "
-    permute key, permutation
+    permute key, read_perm "../config/permuted_choice_1.txt"
   end
 
   def permuted_choice_2 key
-    permutation = File.read("../config/permuted_choice_2.txt").strip.split " "
-    permute key, permutation
+    permute key, read_perm "../config/permuted_choice_2.txt"
   end
 
   ##############################################################################
@@ -82,8 +80,16 @@ class DES
     block.map { |byte| hex_to_bin byte }.flatten
   end
 
+  def bits_to_bytes block
+    block.each_slice(8).map { |bits| bits.join.to_i(2).to_s(16) }
+  end
+
   def hex_to_bin hex
-    [hex].pack("H*").bytes[0].to_s(2).split("").map { |bit| bit.to_i }
+    [hex].pack("H*").bytes[0].to_s(2).split("")
+  end
+
+  def read_perm filename
+    File.read(filename).strip.split " "
   end
 
   def permute block, permutation
