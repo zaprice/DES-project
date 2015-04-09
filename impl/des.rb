@@ -30,7 +30,7 @@ class DES
 
   # Aids diffusion of key material
   def expand  half_block
-    permute half_block, read_perm "../config/expansion.txt"
+    permute half_block, read_perm("../config/expansion.txt")
   end
 
   # Ensures non-linearity from plaintext to ciphertext
@@ -42,7 +42,7 @@ class DES
   # Diffusion of key material and s-box changes
   # Each bit of input should change many bits of output
   def bit_shuffle  half_block
-    permute half_block, read_perm "../config/bit_shuffle.txt"
+    permute half_block, read_perm("../config/bit_shuffle.txt")
   end
 
   # Returns round keys for each Feistel node
@@ -61,11 +61,11 @@ class DES
   end
 
   def permuted_choice_1 key
-    permute key, read_perm "../config/permuted_choice_1.txt"
+    permute key, read_perm("../config/permuted_choice_1.txt")
   end
 
   def permuted_choice_2 key
-    permute key, read_perm "../config/permuted_choice_2.txt"
+    permute key, read_perm("../config/permuted_choice_2.txt")
   end
 
   ##############################################################################
@@ -77,11 +77,19 @@ class DES
   end
 
   def bytes_to_bits block
-    block.map { |byte| hex_to_bin byte }.flatten
+    block.map { |byte| pad_bits hex_to_bin byte }.flatten
   end
 
   def bits_to_bytes block
-    block.each_slice(8).map { |bits| bits.join.to_i(2).to_s(16) }
+    block.each_slice(8).map { |bits| pad_byte bits.join.to_i(2).to_s(16) }
+  end
+
+  def pad_bits byte_in_bits
+    (["0"]*(8 - byte_in_bits.size)).push(byte_in_bits)
+  end
+
+  def pad_byte byte
+    ("0"*(2 - byte.size)).concat(byte)
   end
 
   def hex_to_bin hex
