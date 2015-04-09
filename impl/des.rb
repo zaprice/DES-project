@@ -13,8 +13,10 @@ class DES
     16.times do
       left = block[0..3]
       right = block[4..7]
-      block = append(right, xor(left, feistel(right)))
+      tmp = feistel right
+      block = right.concat(left.zip(tmp).map { |left, right| xor(left, right) })
     end
+    @ctr = 0
     final_permutation block
   end
 
@@ -40,7 +42,8 @@ class DES
   # Ensures non-linearity from plaintext to ciphertext
   # Each bit of ciphertext should depend on many bits of input
   def s_box expanded_block
-
+    # TODO add s-boxes
+    expanded_block
   end
 
   # Diffusion of key material and s-box changes
