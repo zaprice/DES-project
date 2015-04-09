@@ -10,7 +10,7 @@ class DES
 
   def encrypt block
     block = initial_permutation block
-    for @ctr in 0..15
+    16.times do
       left = block[0..3]
       right = block[4..7]
       block = append(right, xor(left, feistel(right)))
@@ -60,8 +60,8 @@ class DES
 
     @left_subkey = shift @left_subkey, SHIFTS[ctr]
     @right_subkey = shift @right_subkey, SHIFTS[ctr]
-    
-    permuted_choice_2 bits_to_bytes @left_subkey.concat(@right_subkey)
+    @ctr += 1
+    permuted_choice_2 bits_to_bytes @left_subkey.dup.concat(@right_subkey)
   end
 
   def permuted_choice_1 key

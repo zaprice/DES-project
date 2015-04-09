@@ -24,6 +24,15 @@ describe "DES" do
     des.key = ["7f","ff","ff","ff","ff","ff","ff","ff"]
     initial_subkey = des.get_subkey
     expect(initial_subkey.size).to eq(6)
+    expect(initial_subkey[2]).to eq("ef")
+  end
+
+  it "generates the correct next subkey" do
+    des = DES.new
+    des.key = ["7f","ff","ff","ff","ff","ff","ff","ff"]
+    next_subkey = des.get_subkey
+    expect(next_subkey.size).to eq(6)
+    expect(next_subkey[2]).to eq("bf")
   end
 
 end
