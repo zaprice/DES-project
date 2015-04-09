@@ -2,7 +2,11 @@ class DES
 
   attr_accessor :key, :left_subkey, :right_subkey, :ctr
 
-  shifts = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]
+  SHIFTS = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]
+
+  def initialize
+    @ctr = 0
+  end
 
   def encrypt block
     block = initial_permutation block
@@ -15,12 +19,12 @@ class DES
   end
 
   def initial_permutation block
-    permutation = File.read("../config/initial_permutation.txt").strip.split " "
+    permutation = File.read("config/initial_permutation.txt").strip.split " "
     permute block, permutation
   end
 
   def final_permutation block
-    permutation = File.read("../config/final_permutation.txt").strip.split " "
+    permutation = File.read("config/final_permutation.txt").strip.split " "
     permute block, permutation
   end
 
@@ -30,7 +34,7 @@ class DES
 
   # Aids diffusion of key material
   def expand  half_block
-    permute half_block, read_perm("../config/expansion.txt")
+    permute half_block, read_perm("config/expansion.txt")
   end
 
   # Ensures non-linearity from plaintext to ciphertext
@@ -42,7 +46,7 @@ class DES
   # Diffusion of key material and s-box changes
   # Each bit of input should change many bits of output
   def bit_shuffle  half_block
-    permute half_block, read_perm("../config/bit_shuffle.txt")
+    permute half_block, read_perm("config/bit_shuffle.txt")
   end
 
   # Returns round keys for each Feistel node
@@ -54,18 +58,18 @@ class DES
       @right_subkey = selected_bits[28..55]
     end
 
-    @left_subkey = shift @left_subkey, shifts[ctr]
-    @right_subkey = shift @right_subky, shift[ctr]
-
-    permuted_choice_2 @left_subkey.add(@right_subkey)
+    @left_subkey = shift @left_subkey, SHIFTS[ctr]
+    @right_subkey = shift @right_subkey, SHIFTS[ctr]
+    
+    permuted_choice_2 bits_to_bytes @left_subkey.concat(@right_subkey)
   end
 
   def permuted_choice_1 key
-    permute key, read_perm("../config/permuted_choice_1.txt")
+    permute key, read_perm("config/permuted_choice_1.txt")
   end
 
   def permuted_choice_2 key
-    permute key, read_perm("../config/permuted_choice_2.txt")
+    permute key, read_perm("config/permuted_choice_2.txt")
   end
 
   ##############################################################################
@@ -77,7 +81,7 @@ class DES
   end
 
   def bytes_to_bits block
-    block.map { |byte| pad_bits hex_to_bin byte }.flatten
+    block.map { |byte| hex_to_bin byte }.flatten
   end
 
   def bits_to_bytes block
@@ -85,7 +89,7 @@ class DES
   end
 
   def pad_bits byte_in_bits
-    (["0"]*(8 - byte_in_bits.size)).push(byte_in_bits)
+    (["0"]*(8 - byte_in_bits.size)).concat(byte_in_bits)
   end
 
   def pad_byte byte
@@ -93,7 +97,7 @@ class DES
   end
 
   def hex_to_bin hex
-    [hex].pack("H*").bytes[0].to_s(2).split("")
+    pad_bits [hex].pack("H*").bytes[0].to_s(2).split("")
   end
 
   def read_perm filename
@@ -102,13 +106,13 @@ class DES
 
   def permute block, permutation
     bits = bytes_to_bits(block)
-    permuted_bits = permutation.map { |index| bits[index - 1]}
+    permuted_bits = permutation.map { |index| bits[index.to_i - 1]}
     bits_to_bytes permuted_bits
   end
 
   def shift subkey, value
     removed = subkey.shift value
-    subkey.push(removed).flatten
+    subkey.concat(removed)
   end
 
 end
