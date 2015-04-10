@@ -30,9 +30,23 @@ describe "DES" do
   it "generates the correct next subkey" do
     des = DES.new
     des.key = ["7f","ff","ff","ff","ff","ff","ff","ff"]
+    des.get_subkey
     next_subkey = des.get_subkey
     expect(next_subkey.size).to eq(6)
-    expect(next_subkey[2]).to eq("bf")
+    expect(next_subkey[1]).to eq("bf")
+  end
+
+  it "performs s-box transformation correctly" do
+    sbox_output = DES.new.s_box ["ff","ff","ff","ff","ff","ff",]
+    expect(sbox_output[0]).to eq("d9")
+  end
+
+  it "encrypts to the correct value" do
+    des = DES.new
+    des.key = ["3b","38","98","37","15","20","f7","5e"]
+    ciphertext = des.encrypt ["00","00","00","00","00","00","00","00"]
+    expect(ciphertext.size).to eq(8)
+    expect(ciphertext).to eq(["83", "a1", "e8", "14", "88", "92", "53", "e0"])
   end
 
 end

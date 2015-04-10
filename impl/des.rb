@@ -17,17 +17,16 @@ class DES
       block = right.concat(left.zip(tmp).map { |left, right| xor(left, right) })
     end
     @ctr = 0
-    final_permutation block
+    # Un-flip the last round
+    final_permutation block[4..7].concat block[0..3]
   end
 
   def initial_permutation block
-    permutation = File.read("config/initial_permutation.txt").strip.split " "
-    permute block, permutation
+    permute block, read_perm("config/initial_permutation.txt")
   end
 
   def final_permutation block
-    permutation = File.read("config/final_permutation.txt").strip.split " "
-    permute block, permutation
+    permute block, read_perm("config/final_permutation.txt")
   end
 
   def feistel  half_block
@@ -42,8 +41,16 @@ class DES
   # Ensures non-linearity from plaintext to ciphertext
   # Each bit of ciphertext should depend on many bits of input
   def s_box expanded_block
-    # TODO add s-boxes
-    expanded_block
+    block_in_bits = bytes_to_bits expanded_block
+    s_boxes = load_sboxes
+    half_block = []
+
+    block_in_bits.each_slice(6).each_with_index do |six_bits, index|
+      y = [six_bits[0], six_bits[5]].join.to_i(2)
+      x = six_bits[1..4].join.to_i(2)
+      half_block.concat pad_word(s_boxes[index][y][x].to_s(2).split(""))
+    end
+    bits_to_bytes half_block
   end
 
   # Diffusion of key material and s-box changes
@@ -95,6 +102,10 @@ class DES
     (["0"]*(8 - byte_in_bits.size)).concat(byte_in_bits)
   end
 
+  def pad_word word_bits
+    (["0"]*(4 - word_bits.size)).concat(word_bits)
+  end
+
   def pad_byte byte
     ("0"*(2 - byte.size)).concat(byte)
   end
@@ -104,12 +115,26 @@ class DES
   end
 
   def read_perm filename
-    File.read(filename).strip.split " "
+    File.read(filename).strip.split(" ").to_i
+  end
+
+  def read_sbox index
+    matrix = []
+    File.open("config/s_#{index}.txt") do |file|
+      file.each_line do |line|
+        matrix.push line.strip.split(" ").to_i
+      end
+    end
+    matrix
+  end
+
+  def load_sboxes
+    (1..8).map { |index| read_sbox index }
   end
 
   def permute block, permutation
     bits = bytes_to_bits(block)
-    permuted_bits = permutation.map { |index| bits[index.to_i - 1]}
+    permuted_bits = permutation.map { |index| bits[index - 1]}
     bits_to_bytes permuted_bits
   end
 
@@ -117,5 +142,10 @@ class DES
     removed = subkey.shift value
     subkey.concat(removed)
   end
+end
 
+class Array
+  def to_i
+    self.map { |int| int.to_i }
+  end
 end

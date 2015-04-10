@@ -10,7 +10,7 @@ In a cipher based on a [Feistel network](https://en.wikipedia.org/wiki/Feistel_c
 * The **bit shuffle** and **plaintext expansion** functions provide _diffusion_, ensuring that small changes in input lead to unpredictable changes in output. A cipher without diffusion is vulnerable to [differential cryptanalytic attacks](https://en.wikipedia.org/wiki/Differential_cryptanalysis).
 
 We will use [DES](https://en.wikipedia.org/wiki/Data_Encryption_Standard) as our cipher, since it is well-known, well-studied, and easy to implement.
-We will perform a practical attack, resulting in either key or plaintext retrieval, on two modified versions of DES; each version will have one of the above steps omitted to demonstrate the kind of attacks each property protects against.
+We will perform a practical attack resulting in either key or plaintext retrieval on two modified versions of DES; each version will have one of the above steps omitted to demonstrate the kind of attacks each property protects against.
 
 
 #####Copyright (C) 2015  Zachary Price
